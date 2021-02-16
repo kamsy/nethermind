@@ -2,12 +2,10 @@ import React from "react";
 import "../style/login.scss";
 import { connect } from "react-redux";
 import loginUser from "../actionCreators/loginUser";
-import { history } from "../App";
 
 const Login = ({ dispatchLogin }) => {
     const handleLogin = () => {
         dispatchLogin();
-        history.push({ pathname: "/cats" });
     };
     return (
         <div className="login-page">
