@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import logoutUser from "../actionCreators/logoutUser";
 import getBreeds from "../actionCreators/getBreeds";
 import getImages from "../actionCreators/getImages";
+import setBreed from "../actionCreators/setBreed";
 
 const LogoutSvg = () => (
     <svg
@@ -42,13 +43,26 @@ const LogoutSvg = () => (
     </svg>
 );
 
+const Loader = () => <div className="spinner" role="status" />;
+
 const Cats = ({
     dispatchLogout,
     dispatchGetBreeds,
     breeds,
     catImages,
-    dispatchGetImages
+    dispatchGetImages,
+    isLoading,
+    dispatchSetBreed,
+    selectedBreed
 }) => {
+    const [breedInfo, setBreedInfo] = useState({});
+    const handleSelection = ({ target: { value } }) => {
+        setBreedInfo({
+            name: value.split(",")[0],
+            id: value.split(",")[1]
+        });
+    };
+
     const handleLogout = () => {
         dispatchLogout();
     };
@@ -60,13 +74,10 @@ const Cats = ({
         }
     }, [breeds, dispatchGetBreeds]);
 
-    const [selectedBreed, setSelectedBreed] = useState(null);
-
-    const handleSelection = ({ target: { value } }) => {
-        setSelectedBreed(value.split(",")[0]);
-        dispatchGetImages(value.split(",")[1]);
+    const fetchBreed = () => {
+        dispatchSetBreed(breedInfo);
+        dispatchGetImages(selectedBreed.id);
     };
-
     return (
         <div className="cats-page">
             <nav className="nav">
@@ -81,7 +92,12 @@ const Cats = ({
 
             <div className="container">
                 <div className="card-cont">
-                    <select onChange={handleSelection}>
+                    <select
+                        onChange={handleSelection}
+                        defaultValue={`${[
+                            selectedBreed.name,
+                            selectedBreed.id
+                        ]}`}>
                         <option defaultValue="default" disabled>
                             Select a breed
                         </option>
@@ -96,32 +112,49 @@ const Cats = ({
                                 )}
                             </>
                         ) : (
-                            <span>loading breeds...</span>
+                            <Loader />
                         )}
                     </select>
+                    <button
+                        type="button"
+                        className="cstm-btn"
+                        onClick={fetchBreed}>
+                        <span>Search</span>
+                    </button>
                 </div>
 
                 <div className="cats-cont">
-                    <h3>{selectedBreed}</h3>
-                    <div className="cats-grid">
-                        {Children.toArray(
-                            catImages.map(data => <img src={data.url} />)
-                        )}
-                    </div>
+                    <h3>{selectedBreed.name}</h3>
+                    {isLoading ? (
+                        <Loader />
+                    ) : (
+                        <div className="cats-grid">
+                            {Children.toArray(
+                                catImages.map(data => (
+                                    <div className="img-cont">
+                                        <img src={data.url} />
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
     );
 };
 
-const mapStateToProps = ({ cats }) => {
+const mapStateToProps = ({ cats, loader }) => {
     return {
         breeds: cats.breeds,
-        catImages: cats.catImages
+        catImages: cats.catImages,
+        selectedBreed: cats.selectedBreed,
+        isLoading: loader.isLoading
     };
 };
 
 const mapDispatchToProps = dispatch => ({
+    dispatchSetBreed: payload => dispatch(setBreed(payload)),
     dispatchLogout: () => dispatch(logoutUser()),
     dispatchGetBreeds: () => dispatch(getBreeds()),
     dispatchGetImages: breed_id => dispatch(getImages({ breed_id }))

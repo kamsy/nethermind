@@ -1,9 +1,10 @@
-import { SET_CATS_IMAGES, SET_BREEDS } from "../variables";
+import { SET_CATS_IMAGES, SET_BREEDS, SET_BREED } from "../variables";
 import InitialState from "./initialState";
 
 const cats = (state = InitialState, { type, payload }) => {
-    console.log("cats -> state", state);
     switch (type) {
+        case SET_BREED:
+            return { ...state, selectedBreed: payload };
         case SET_BREEDS:
             return { ...state, breeds: payload };
         case SET_CATS_IMAGES:
