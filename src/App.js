@@ -6,7 +6,6 @@ import Cats from "./pages/Cats";
 import Login from "./pages/Login";
 import "./style/global.scss";
 import { connect } from "react-redux";
-import { persistor } from "./store";
 
 const history = createBrowserHistory();
 
