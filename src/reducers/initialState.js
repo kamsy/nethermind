@@ -1,5 +1,7 @@
 const InitialState = {
+    isLoading: false,
     loggedIn: false,
+    selectedBreed: {},
     breeds: [],
     catImages: []
 };
