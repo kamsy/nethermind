@@ -1,0 +1,22 @@
+@import './variables';
+@import './mixins';
+
+.login-page {
+    margin-top: 100px;
+
+    .form {
+        max-width: 450px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        @include screen(450){
+            padding: 0 1rem
+        }
+
+    }
+
+    h3 {
+        margin: 0 0 12px;
+        color: $black;
+        @include fluid-type(24px)
+    }
+}
