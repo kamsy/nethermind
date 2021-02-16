@@ -1,25 +1,101 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import { Redirect, Route, Switch } from "react-router-dom";
+import { Router } from "react-router";
+import { createBrowserHistory } from "history";
+import Cats from "./pages/Cats";
+import Login from "./pages/Login";
+import "./style/global.scss";
+import { connect } from "react-redux";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const history = createBrowserHistory();
+
+// Private Router function
+const PrivateRoute = ({ component: Component, ...rest }) => {
+    return (
+        <Route
+            {...rest}
+            render={props => (
+                <Component
+                    {...{
+                        ...props,
+                        ...rest
+                    }}
+                />
+            )}
+        />
+    );
+};
+const AuthRoute = ({ component: Component, ...rest }) => (
+    <Route
+        {...rest}
+        render={props => <Component {...{ ...props, ...rest }} />}
+    />
+);
+
+export { history };
+
+const NotFound = () => <div>404 PAGE</div>;
+
+function App({ loggedIn }) {
+    useEffect(() => {
+        if (loggedIn) {
+            history.push({ pathname: "/cats" });
+        } else {
+            history.push({ pathname: "/login" });
+        }
+    }, [loggedIn]);
+
+    return (
+        <Router history={history}>
+            <Switch>
+                <Route
+                    exact
+                    path="/"
+                    render={() =>
+                        loggedIn ? (
+                            <Redirect
+                                push
+                                to={{
+                                    pathname: "/cats"
+                                }}
+                            />
+                        ) : (
+                            <Redirect
+                                to={{
+                                    pathname: "/login"
+                                }}
+                            />
+                        )
+                    }
+                />
+
+                <AuthRoute exact path="/login" component={Login} />
+
+                <PrivateRoute exact path="/cats" component={Cats} />
+
+                <Route exact path="/#/404" component={NotFound} />
+                <Route
+                    path="*"
+                    render={props => (
+                        <Redirect
+                            to={{
+                                pathname: "/#/404"
+                            }}
+                            {...props}
+                        />
+                    )}
+                />
+            </Switch>
+        </Router>
+    );
 }
 
-export default App;
+const mapStateToProps = ({ auth }) => {
+    return {
+        loggedIn: auth.loggedIn
+    };
+};
+
+const mapDispatchToProps = () => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
