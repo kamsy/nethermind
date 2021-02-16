@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, Children } from "react";
 import "../style/cats.scss";
 import { connect } from "react-redux";
 import logoutUser from "../actionCreators/logoutUser";
 import getBreeds from "../actionCreators/getBreeds";
+import getImages from "../actionCreators/getImages";
 
 const LogoutSvg = () => (
     <svg
@@ -41,9 +42,29 @@ const LogoutSvg = () => (
     </svg>
 );
 
-const Cats = ({ dispatchLogout, dispatchGetBreeds, breeds }) => {
+const Cats = ({
+    dispatchLogout,
+    dispatchGetBreeds,
+    breeds,
+    catImages,
+    dispatchGetImages
+}) => {
     const handleLogout = () => {
         dispatchLogout();
+    };
+
+    useState(() => {
+        if (breeds.length > 0) return;
+        else {
+            dispatchGetBreeds();
+        }
+    }, [breeds, dispatchGetBreeds]);
+
+    const [selectedBreed, setSelectedBreed] = useState(null);
+
+    const handleSelection = ({ target: { value } }) => {
+        setSelectedBreed(value.split(",")[0]);
+        dispatchGetImages(value.split(",")[1]);
     };
 
     return (
@@ -60,24 +81,50 @@ const Cats = ({ dispatchLogout, dispatchGetBreeds, breeds }) => {
 
             <div className="container">
                 <div className="card-cont">
-                    <select>
-                        <option selected disabled>
-                            Select a category
+                    <select onChange={handleSelection}>
+                        <option defaultValue="default" disabled>
+                            Select a breed
                         </option>
+                        {breeds.length > 0 ? (
+                            <>
+                                {Children.toArray(
+                                    breeds.map(({ name, id }) => (
+                                        <option value={[name, id]}>
+                                            {name}
+                                        </option>
+                                    ))
+                                )}
+                            </>
+                        ) : (
+                            <span>loading breeds...</span>
+                        )}
                     </select>
+                </div>
+
+                <div className="cats-cont">
+                    <h3>{selectedBreed}</h3>
+                    <div className="cats-grid">
+                        {Children.toArray(
+                            catImages.map(data => <img src={data.url} />)
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-const mapStateToProps = ({ cats }) => ({
-    breeds: cats.breeds
-});
+const mapStateToProps = ({ cats }) => {
+    return {
+        breeds: cats.breeds,
+        catImages: cats.catImages
+    };
+};
 
 const mapDispatchToProps = dispatch => ({
     dispatchLogout: () => dispatch(logoutUser()),
-    dispatchGetBreeds: () => dispatch(getBreeds())
+    dispatchGetBreeds: () => dispatch(getBreeds()),
+    dispatchGetImages: breed_id => dispatch(getImages({ breed_id }))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cats);
