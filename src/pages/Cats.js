@@ -131,7 +131,9 @@ const Cats = ({
                         <div className="cats-grid" data-testid="cats-grid">
                             {Children.toArray(
                                 catImages.map(data => (
-                                    <div className="img-cont">
+                                    <div
+                                        className="img-cont"
+                                        data-testid="img-cont">
                                         <img src={data.url} alt={data.id} />
                                     </div>
                                 ))

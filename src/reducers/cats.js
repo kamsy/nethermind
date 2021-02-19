@@ -1,4 +1,9 @@
-import { SET_CATS_IMAGES, SET_BREEDS, SET_BREED } from "../variables";
+import {
+    SET_CATS_IMAGES,
+    SET_BREEDS,
+    SET_BREED,
+    LOGOUT_USER
+} from "../variables";
 import InitialState from "./initialState";
 
 const cats = (state = InitialState, { type, payload }) => {
@@ -9,6 +14,8 @@ const cats = (state = InitialState, { type, payload }) => {
             return { ...state, breeds: payload };
         case SET_CATS_IMAGES:
             return { ...state, catImages: payload };
+        case LOGOUT_USER:
+            return { ...state, catImages: [], selectedBreed: {}, breeds: [] };
         default:
             return state;
     }
