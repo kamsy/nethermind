@@ -2,14 +2,15 @@ import React from "react";
 import "../style/login.scss";
 import { connect } from "react-redux";
 import loginUser from "../actionCreators/loginUser";
+import { history } from "../App";
 
-const Login = ({ dispatchLogin }) => {
-    const handleLogin = () => {
-        dispatchLogin();
+const Login = ({ loginUser }) => {
+    const callLogin = () => {
+        loginUser();
     };
     return (
         <div className="login-page">
-            <form className="form">
+            <form className="form" onSubmit={callLogin}>
                 <h3>Login</h3>
                 <input
                     value="olekakamsy@gmail.com"
@@ -26,17 +27,18 @@ const Login = ({ dispatchLogin }) => {
 
                 <button
                     type="button"
+                    data-testid="login-btn"
                     className="cstm-btn"
-                    onClick={handleLogin}>
-                    <span>Log in</span>
+                    onClick={callLogin}>
+                    <span>Login</span>
                 </button>
             </form>
         </div>
     );
 };
 
-const mapDispatchToProps = dispatch => ({
-    dispatchLogin: () => dispatch(loginUser())
-});
+const mapDispatchToProps = {
+    loginUser
+};
 
 export default connect(null, mapDispatchToProps)(Login);

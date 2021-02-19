@@ -1,4 +1,4 @@
-import React, { useState, Children } from "react";
+import React, { useState, Children, Fragment, useEffect } from "react";
 import "../style/cats.scss";
 import { connect } from "react-redux";
 import logoutUser from "../actionCreators/logoutUser";
@@ -46,14 +46,14 @@ const LogoutSvg = () => (
 const Loader = () => <div className="spinner" role="status" />;
 
 const Cats = ({
-    dispatchLogout,
-    dispatchGetBreeds,
+    logoutUser,
     breeds,
     catImages,
-    dispatchGetImages,
+    getImages,
     isLoading,
-    dispatchSetBreed,
-    selectedBreed
+    selectedBreed,
+    getBreeds,
+    setBreed
 }) => {
     const [breedInfo, setBreedInfo] = useState({});
     const handleSelection = ({ target: { value } }) => {
@@ -64,25 +64,23 @@ const Cats = ({
     };
 
     const handleLogout = () => {
-        dispatchLogout();
+        logoutUser();
     };
 
-    useState(() => {
-        if (breeds.length > 0) return;
-        else {
-            dispatchGetBreeds();
-        }
-    }, [breeds, dispatchGetBreeds]);
+    useEffect(() => {
+        getBreeds();
+    }, []);
 
     const fetchBreed = () => {
-        dispatchSetBreed(breedInfo);
-        dispatchGetImages(selectedBreed.id);
+        setBreed(breedInfo);
+        getImages({ breed_id: selectedBreed.id });
     };
     return (
         <div className="cats-page">
             <nav className="nav">
                 <span
                     role="button"
+                    data-testid="logout-btn"
                     className="logout-btn"
                     onClick={handleLogout}>
                     Logout
@@ -93,16 +91,17 @@ const Cats = ({
             <div className="container">
                 <div className="card-cont">
                     <select
+                        data-testid="select-dropdown"
                         onChange={handleSelection}
                         defaultValue={`${[
                             selectedBreed.name,
                             selectedBreed.id
                         ]}`}>
-                        <option defaultValue="default" disabled>
+                        <option defaultValue="default" disabled={breedInfo.id}>
                             Select a breed
                         </option>
                         {breeds.length > 0 ? (
-                            <>
+                            <Fragment>
                                 {Children.toArray(
                                     breeds.map(({ name, id }) => (
                                         <option value={[name, id]}>
@@ -110,7 +109,7 @@ const Cats = ({
                                         </option>
                                     ))
                                 )}
-                            </>
+                            </Fragment>
                         ) : (
                             <Loader />
                         )}
@@ -153,11 +152,11 @@ const mapStateToProps = ({ cats, loader }) => {
     };
 };
 
-const mapDispatchToProps = dispatch => ({
-    dispatchSetBreed: payload => dispatch(setBreed(payload)),
-    dispatchLogout: () => dispatch(logoutUser()),
-    dispatchGetBreeds: () => dispatch(getBreeds()),
-    dispatchGetImages: breed_id => dispatch(getImages({ breed_id }))
-});
+const mapDispatchToProps = {
+    setBreed,
+    logoutUser,
+    getImages,
+    getBreeds
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cats);
