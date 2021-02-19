@@ -12,7 +12,7 @@ const persistConfig = {
 const finalCreateStore =
     process.env.NODE_ENV === "development"
         ? applyMiddleware(thunk, logger)(createStore)
-        : createStore;
+        : applyMiddleware(thunk)(createStore);
 
 const persistedReducer = persistReducer(persistConfig, indexReducer);
 

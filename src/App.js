@@ -1,13 +1,15 @@
 import React, { useEffect } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { Router } from "react-router";
-import { createBrowserHistory } from "history";
 import Cats from "./pages/Cats";
 import Login from "./pages/Login";
 import "./style/global.scss";
 import { connect } from "react-redux";
+import { persistor } from "./store";
 
-const history = createBrowserHistory();
+import { createBrowserHistory } from "history";
+
+export const history = createBrowserHistory();
 
 // Private Router function
 const PrivateRoute = ({ component: Component, ...rest }) => {
@@ -32,16 +34,16 @@ const AuthRoute = ({ component: Component, ...rest }) => (
     />
 );
 
-export { history };
-
 const NotFound = () => <div>404 PAGE</div>;
 
 function App({ loggedIn }) {
     useEffect(() => {
         if (loggedIn) {
-            history.push({ pathname: "/cats" });
+            history.push("/cats");
         } else {
-            history.push({ pathname: "/login" });
+            persistor.flush().then(() => {
+                history.push("/login");
+            });
         }
     }, [loggedIn]);
 

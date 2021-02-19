@@ -2,7 +2,6 @@ import React from "react";
 import "../style/login.scss";
 import { connect } from "react-redux";
 import loginUser from "../actionCreators/loginUser";
-import { history } from "../App";
 
 const Login = ({ loginUser }) => {
     const callLogin = () => {

@@ -55,6 +55,10 @@ const Cats = ({
     getBreeds,
     setBreed
 }) => {
+    useEffect(() => {
+        getBreeds();
+    }, [getBreeds]);
+
     const [breedInfo, setBreedInfo] = useState({});
     const handleSelection = ({ target: { value } }) => {
         setBreedInfo({
@@ -67,13 +71,9 @@ const Cats = ({
         logoutUser();
     };
 
-    useEffect(() => {
-        getBreeds();
-    }, []);
-
     const fetchBreed = () => {
         setBreed(breedInfo);
-        getImages({ breed_id: selectedBreed.id });
+        getImages({ breed_id: breedInfo.id });
     };
     return (
         <div className="cats-page">
@@ -91,7 +91,7 @@ const Cats = ({
             <div className="container">
                 <div className="card-cont">
                     <select
-                        data-testid="select-dropdown"
+                        data-testid="dropdown-test-id"
                         onChange={handleSelection}
                         defaultValue={`${[
                             selectedBreed.name,
@@ -104,18 +104,19 @@ const Cats = ({
                             <Fragment>
                                 {Children.toArray(
                                     breeds.map(({ name, id }) => (
-                                        <option value={[name, id]}>
+                                        <option
+                                            value={[name, id]}
+                                            data-testid="breed-type">
                                             {name}
                                         </option>
                                     ))
                                 )}
                             </Fragment>
-                        ) : (
-                            <Loader />
-                        )}
+                        ) : null}
                     </select>
                     <button
                         type="button"
+                        data-testid="search-btn"
                         className="cstm-btn"
                         onClick={fetchBreed}>
                         <span>Search</span>
@@ -127,11 +128,11 @@ const Cats = ({
                     {isLoading ? (
                         <Loader />
                     ) : (
-                        <div className="cats-grid">
+                        <div className="cats-grid" data-testid="cats-grid">
                             {Children.toArray(
                                 catImages.map(data => (
                                     <div className="img-cont">
-                                        <img src={data.url} />
+                                        <img src={data.url} alt={data.id} />
                                     </div>
                                 ))
                             )}
